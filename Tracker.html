@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yerel Bütçe ve Finansal Takip Aracı</title>
+    <!-- Tailwind CSS doğrudan dahil edildi -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts doğrudan dahil edildi -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+        .card {
+            background-color: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .input-field {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.5rem;
+            border: 1px solid #d1d5db;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4);
+        }
+        .currency:before {
+            content: 'TL';
+            position: absolute;
+            right: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280;
+        }
+        .percentage:before {
+            content: '%';
+            position: absolute;
+            right: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280;
+        }
+        .months:before {
+            content: 'Ay';
+            position: absolute;
+            right: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280;
+        }
+        .table-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0.25rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .table-row:last-child {
+            border-bottom: none;
+        }
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+        .btn-primary {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #2563eb;
+        }
+        .btn-danger {
+            background-color: #ef4444;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+        .btn-danger:hover {
+            background-color: #dc2626;
+        }
+        /* Yönetici Paneli için stil */
+        #adminPanel {
+            display: none; /* Başlangıçta gizli */
+            transition: all 0.5s ease-in-out;
+        }
+        /* Modal Stilleri */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        /* Toggle Switch Stilleri */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            -webkit-transition: .4s;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #3b82f6;
+        }
+        input:focus + .slider {
+            box-shadow: 0 0 1px #3b82f6;
+        }
+        input:checked + .slider:before {
+            -webkit-transform: translateX(26px);
+            -ms-transform: translateX(26px);
+            transform: translateX(26px);
+        }
+
+        /* Uyarı renkleri */
+        .overdue-item {
+            color: #dc2626; /* Red-600 */
+            font-weight: bold;
+        }
+        .due-soon-item {
+            color: #f59e0b; /* Orange-500 */
+            font-weight: bold;
+        }
+        .due-soon-text {
+            color: #f59e0b;
+        }
+        .overdue-text {
+            color: #dc2626;
+        }
+        .weekly-reminder {
+            background-color: #fffbe6; /* Light yellow background */
+            border: 1px solid #fcd34d; /* Yellow border */
+            color: #b45309; /* Darker yellow text */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap; /* allow wrapping on smaller screens */
+            gap: 1rem; /* space between elements */
+        }
+        .weekly-reminder button {
+            background-color: #fcd34d;
+            color: #b45309;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+        .weekly-reminder button:hover {
+            background-color: #fbbf24;
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-6 lg:p-8">
+
+    <div class="max-w-5xl mx-auto">
+        <header class="text-center mb-6 relative">
+            <h1 class="text-3xl font-bold text-gray-800">Dinamik Bütçe ve Finansal Takip Aracı</h1>
+            <p class="text-md text-gray-600 mt-2">Finansal durumunuzu kontrol altına alın ve birikim hedeflerine ulaşın.</p>
+            <p id="user-id-display" class="text-sm text-gray-500 mt-2">Kullanıcı Kimliği: Yerel Kullanıcı (Çevrimdışı Mod)</p>
+
+            <!-- Düzenleme Modu Switch'i -->
+            <div class="absolute top-0 right-0 flex items-center space-x-2">
+                <span class="text-gray-700 text-sm font-semibold">Düzenleme Modu</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="toggleAdminPanel">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </header>
+
+        <!-- Haftalık Dışa Aktarma Uyarısı -->
+        <div id="weeklyExportReminder" class="weekly-reminder hidden">
+            <p class="flex-grow">Verilerinizi düzenli olarak yedeklemeniz önerilir! Şimdi dışa aktarmak ister misiniz?</p>
+            <div class="flex gap-2">
+                <button onclick="exportAllDataAndDismissReminder()">Şimdi Dışa Aktar</button>
+                <button onclick="dismissWeeklyExportReminder()">Bu Haftalık Gizle</button>
+            </div>
+        </div>
+
+        <!-- Yönetici Paneli -->
+        <div id="adminPanel" class="card">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">Düzenleme Modu</h2>
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Yeni Gelir Ekle -->
+                <div class="p-4 border rounded-lg">
+                    <h3 class="font-semibold mb-2">Yeni Gelir Ekle</h3>
+                    <input id="adminIncomeName" type="text" class="input-field mb-2" placeholder="Gelir Adı (Örn: Maaş)">
+                    <input id="adminIncomeAmount" type="number" class="input-field mb-2" placeholder="Tutar (TL)">
+                    <button onclick="addItem('income')" class="btn btn-primary w-full">Gelir Ekle</button>
+                </div>
+                <!-- Yeni Sabit Gider Ekle -->
+                <div class="p-4 border rounded-lg">
+                    <h3 class="font-semibold mb-2">Yeni Sabit Gider Ekle</h3>
+                    <input id="adminFixedExpenseName" type="text" class="input-field mb-2" placeholder="Gider Adı (Örn: Kira)">
+                    <input id="adminFixedExpenseAmount" type="number" class="input-field mb-2" placeholder="Tutar (TL)">
+                    <input id="adminFixedExpenseDate" type="date" class="input-field mb-2">
+                    <button onclick="addItem('fixed')" class="btn btn-primary w-full">Gider Ekle</button>
+                </div>
+                <!-- Yeni Borç Ekle -->
+                <div class="p-4 border rounded-lg">
+                    <h3 class="font-semibold mb-2">Yeni Borç Ekle</h3>
+                    <input id="adminDebtName" type="text" class="input-field mb-2" placeholder="Borç Adı (Örn: Kredi Kartı)">
+                    <div class="relative mb-2">
+                        <input id="adminDebtPrincipal" type="number" class="input-field pr-10" placeholder="Anapara">
+                        <span class="currency"></span>
+                    </div>
+                    <div class="relative mb-2">
+                        <input id="adminDebtInterestRate" type="number" step="0.01" class="input-field pr-10" placeholder="Yıllık Faiz Oranı (%)">
+                        <span class="percentage"></span>
+                    </div>
+                    <div class="relative mb-2">
+                        <input id="adminDebtTerm" type="number" class="input-field pr-10" placeholder="Vade (Ay)">
+                        <span class="months"></span>
+                    </div>
+                    <input id="adminDebtDate" type="date" class="input-field mb-2">
+                    <input id="adminDebtInfo" type="text" class="input-field mb-2" placeholder="Ek Bilgi">
+                    <button onclick="addItem('debt')" class="btn btn-primary w-full">Borç Ekle</button>
+                </div>
+                <!-- Yeni Değişken Gider Ekle -->
+                <div class="p-4 border rounded-lg">
+                    <h3 class="font-semibold mb-2">Yeni Değişken Gider Ekle</h3>
+                    <input id="adminVarExpenseName" type="text" class="input-field mb-2" placeholder="Harcama Adı (Örn: Ulaşım)">
+                    <input id="adminVarExpenseCategory" type="text" class="input-field mb-2" placeholder="Kategori (Örn: Gıda)">
+                    <input id="adminVarExpenseInfo" type="text" class="input-field mb-2" placeholder="Bilgi (Örn: Pluxee sonrası)">
+                    <button onclick="addItem('variable')" class="btn btn-primary w-full">Harcama Ekle</button>
+                </div>
+                <!-- Yeni Ekstre Ekle -->
+                <div class="p-4 border rounded-lg">
+                    <h3 class="font-semibold mb-2">Yeni Ekstre Ekle</h3>
+                    <input id="adminStatementName" type="text" class="input-field mb-2" placeholder="Ekstre Adı (Örn: Kredi Kartı Ekstresi)">
+                    <input id="adminStatementDate" type="date" class="input-field mb-2">
+                    <textarea id="adminStatementContent" class="input-field mb-2 h-24" placeholder="Ekstre içeriği veya linki"></textarea>
+                    <button onclick="addItem('statement')" class="btn btn-primary w-full">Ekstre Ekle</button>
+                </div>
+                 <!-- Kredi Risk Raporu (JSON) Yükle -->
+                <div class="p-4 border rounded-lg lg:col-span-2">
+                    <h3 class="font-semibold mb-2">Kredi Risk Raporu (JSON) Yükle</h3>
+                    <p class="text-sm text-gray-600 mb-2">Bir yapay zeka tarafından analiz edilmiş Findeks veya benzeri risk raporunuzu JSON olarak buraya yapıştırın. (Doğrudan dosya yükleme desteklenmez.)</p>
+                    <textarea id="adminRiskReportJson" class="input-field mb-2 h-32" placeholder="Buraya JSON verisini yapıştırın..."></textarea>
+                    <button onclick="importRiskReport()" class="btn btn-primary w-full">Raporu İçe Aktar</button>
+                </div>
+                <!-- Tüm Verileri Dışa Aktar -->
+                <div class="p-4 border rounded-lg lg:col-span-2">
+                    <h3 class="font-semibold mb-2">Tüm Verileri Dışa Aktar</h3>
+                    <p class="text-sm text-gray-600 mb-2">Tüm bütçe verilerinizi JSON formatında yedeklemek için aşağıdaki alanı kopyalayın.</p>
+                    <textarea id="exportDataJson" class="input-field mb-2 h-32" readonly></textarea>
+                    <button onclick="exportAllData()" class="btn btn-primary w-full mb-2">Verileri Dışa Aktar</button>
+                    <button onclick="copyToClipboard('exportDataJson')" class="btn btn-primary w-full">Kopyala</button>
+                </div>
+                <!-- Tüm Verileri İçe Aktar -->
+                <div class="p-4 border rounded-lg lg:col-span-2">
+                    <h3 class="font-semibold mb-2">Tüm Verileri İçe Aktar</h3>
+                    <p class="text-sm text-gray-600 mb-2">Daha önce dışa aktardığınız JSON verisini yapıştırarak tüm bütçe verilerinizi geri yükleyin.</p>
+                    <textarea id="importDataJson" class="input-field mb-2 h-32" placeholder="Buraya içe aktarılacak JSON verisini yapıştırın..."></textarea>
+                    <button onclick="importAllData()" class="btn btn-primary w-full">Verileri İçe Aktar</button>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Finansal Özet -->
+        <div class="card">
+            <h2 class="text-xl font-semibold text-gray-700 mb-4">Mevcut Finansal Durum (25.06.2025 Raporuna Göre)</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                <div> <p class="text-sm text-gray-500">Findeks Notu</p><p id="summary-findeks-score" class="text-2xl font-bold text-orange-500">1167</p><p id="summary-findeks-risk" class="text-xs text-orange-500">(Orta Riskli)</p></div>
+                <div><p class="text-sm text-gray-500">Toplam Borç</p><p id="summary-total-debt" class="text-2xl font-bold text-red-600">169.630 TL</p></div>
+                <div><p class="text-sm text-gray-500">Toplam Limit</p><p id="summary-total-limit" class="text-2xl font-bold text-green-600">197.000 TL</p></div>
+                <div><p class="text-sm text-gray-500">Borç/Limit Oranı</p><p id="summary-debt-limit-ratio" class="text-2xl font-bold text-red-600">%86</p></div>
+            </div>
+        </div>
+
+        <!-- Yaklaşan Ödemeler ve Uyarılar -->
+        <div class="card" id="warningsPanel">
+            <h2 class="text-xl font-semibold text-gray-700 mb-4">Yaklaşan Ödemeler ve Uyarılar</h2>
+            <div id="warningsList" class="space-y-2">
+                <p class="text-gray-500">Yaklaşan veya gecikmiş ödeme bulunmamaktadır.</p>
+            </div>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6">
+            <!-- Sol Sütun -->
+            <div>
+                <div class="card"><h2 class="text-xl font-semibold text-gray-700 mb-2">Aylık Gelirler</h2><div id="incomeList" class="divide-y divide-gray-200"></div></div>
+                <div class="card"><h2 class="text-xl font-semibold text-gray-700 mb-2">Sabit Giderler</h2><div id="fixedExpenseList" class="divide-y divide-gray-200"></div></div>
+            </div>
+            <!-- Sağ Sütun -->
+            <div>
+                <div class="card"><h2 class="text-xl font-semibold text-gray-700 mb-2">Borç Ödemeleri</h2><p class="text-sm text-gray-500 mb-4">Bu ay yapmayı planladığınız ödeme tutarlarını girin.</p><div id="debtList" class="space-y-3"></div></div>
+                <div class="card"><h2 class="text-xl font-semibold text-gray-700 mb-2">Değişken Giderler</h2><p class="text-sm text-gray-500 mb-4">Bu ayki diğer harcamalarınızı girin.</p><div id="variableExpenseList" class="space-y-3"></div></div>
+            </div>
+        </div>
+
+        <!-- Ekstreler Listesi -->
+        <div class="card">
+            <h2 class="text-xl font-semibold text-gray-700 mb-2">Ekstreler</h2>
+            <div id="statementList" class="divide-y divide-gray-200"></div>
+        </div>
+
+
+        <!-- Aylık Özet -->
+        <div class="card sticky bottom-0 z-10">
+              <h2 class="text-xl font-semibold text-gray-700 mb-4">Aylık Bütçe Özeti</h2>
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                  <div><p class="text-sm text-gray-500">Toplam Gelir</p><p id="summary-income" class="text-2xl font-bold text-green-600">0 TL</p></div>
+                  <div><p class="text-sm text-gray-500">Toplam Gider</p><p id="summary-expenses" class="text-2xl font-bold text-red-600">0 TL</p></div>
+                  <div class="col-span-2"><p class="text-sm text-gray-500">AYLIK NET DURUM (BİRİKİM / AÇIK)</p><p id="summary-net" class="text-4xl font-extrabold">0 TL</p></div>
+              </div>
+        </div>
+    </div>
+
+    <!-- Custom Modal Structure -->
+    <div id="customModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <p id="modalMessage" class="text-lg text-gray-800 mb-4"></p>
+            <div class="modal-buttons">
+                <button id="modalConfirmBtn" class="btn btn-primary hidden">Evet</button>
+                <button id="modalCancelBtn" class="btn btn-danger hidden">Hayır</button>
+                <button id="modalOkBtn" class="btn btn-primary hidden">Tamam</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Veri Deposu - Artık localStorage kullanır
+        let data = {
+            incomes: [],
+            fixedExpenses: [],
+            debts: [],
+            variableExpenses: [],
+            statements: [],
+        };
+
+        // Custom Modal İşlevselliği
+        let resolveModalPromise;
+
+        /**
+         * Özel bir modal penceresi gösterir (uyarı veya onay için).
+         * @param {string} message - Modalda gösterilecek mesaj.
+         * @param {boolean} isConfirm - Onay diyaloğu için true (Evet/Hayır), uyarı için false (Tamam).
+         * @returns {Promise<boolean>} - Onaylanırsa true, iptal edilirse false döndürür, uyarılar için her zaman true.
+         */
+        function showCustomModal(message, isConfirm = false) {
+            const modal = document.getElementById('customModal');
+            const modalMessage = document.getElementById('modalMessage');
+            const modalConfirmBtn = document.getElementById('modalConfirmBtn');
+            const modalCancelBtn = document.getElementById('modalCancelBtn');
+            const modalOkBtn = document.getElementById('modalOkBtn');
+
+            modalMessage.textContent = message;
+
+            // Düğme görünürlüğünü sıfırla
+            modalConfirmBtn.classList.add('hidden');
+            modalCancelBtn.classList.add('hidden');
+            modalOkBtn.classList.add('hidden');
+
+            // Diyalog türüne göre düğmeleri ayarla
+            if (isConfirm) {
+                modalConfirmBtn.classList.remove('hidden');
+                modalCancelBtn.classList.remove('hidden');
+            } else {
+                modalOkBtn.classList.remove('hidden');
+            }
+
+            modal.classList.remove('hidden'); // Modalı göster
+
+            return new Promise(resolve => {
+                resolveModalPromise = resolve;
+
+                const confirmHandler = () => {
+                    modal.classList.add('hidden');
+                    resolve(true);
+                    modalConfirmBtn.removeEventListener('click', confirmHandler);
+                    modalCancelBtn.removeEventListener('click', cancelHandler);
+                    modalOkBtn.removeEventListener('click', okHandler);
+                };
+
+                const cancelHandler = () => {
+                    modal.classList.add('hidden');
+                    resolve(false);
+                    modalConfirmBtn.removeEventListener('click', confirmHandler);
+                    modalCancelBtn.removeEventListener('click', cancelHandler);
+                    modalOkBtn.removeEventListener('click', okHandler);
+                };
+
+                const okHandler = () => {
+                    modal.classList.add('hidden');
+                    resolve(true); // Tamam için her zaman true
+                    modalConfirmBtn.removeEventListener('click', confirmHandler);
+                    modalCancelBtn.removeEventListener('click', cancelHandler);
+                    modalOkBtn.removeEventListener('click', okHandler);
+                };
+
+                modalConfirmBtn.addEventListener('click', confirmHandler);
+                modalCancelBtn.addEventListener('click', cancelHandler);
+                modalOkBtn.addEventListener('click', okHandler);
+            });
+        }
+
+        // Yerel alert ve confirm yerine kendi fonksiyonlarımızı kullan
+        window.customAlert = (message) => showCustomModal(message, false);
+        window.customConfirm = (message) => showCustomModal(message, true);
+
+
+        // --- YARDIMCI FONKSİYONLAR ---
+
+        /**
+         * Kredi amortisman formülünü kullanarak aylık ödemeyi hesaplar.
+         * @param {number} principal - Kredi anapara miktarı.
+         * @param {number} annualInterestRate - Yıllık faiz oranı yüzde olarak (örn: %5 için 5).
+         * @param {number} loanTermMonths - Kredi vadesi ay olarak.
+         * @returns {number} - Hesaplanan aylık ödeme veya geçersiz girişler için 0.
+         */
+        function amortizeLoan(principal, annualInterestRate, loanTermMonths) {
+            if (principal <= 0 || loanTermMonths <= 0) return 0;
+            const monthlyInterestRate = (annualInterestRate / 100) / 12;
+
+            if (monthlyInterestRate === 0) {
+                return principal / loanTermMonths;
+            } else {
+                return principal * (monthlyInterestRate * Math.pow(1 + monthlyInterestRate, loanTermMonths)) / (Math.pow(1 + monthlyInterestRate, loanTermMonths) - 1);
+            }
+        }
+
+        /**
+         * Verileri localStorage'a kaydeder.
+         */
+        function saveDataToLocalStorage() {
+            localStorage.setItem('budgetTrackerData', JSON.stringify(data));
+        }
+
+        /**
+         * Verileri localStorage'dan yükler.
+         */
+        function loadDataFromLocalStorage() {
+            const savedData = localStorage.getItem('budgetTrackerData');
+            if (savedData) {
+                data = JSON.parse(savedData);
+            } else {
+                // Varsayılan boş veriler veya başlangıç verileri
+                data = {
+                    incomes: [],
+                    fixedExpenses: [],
+                    debts: [],
+                    variableExpenses: [],
+                    statements: [],
+                };
+            }
+        }
+
+        /**
+         * Belirtilen bir textarea'daki içeriği panoya kopyalar.
+         * @param {string} elementId - Kopyalanacak metin alanının ID'si.
+         */
+        async function copyToClipboard(elementId) {
+            const textarea = document.getElementById(elementId);
+            if (textarea && textarea.value) {
+                // Modern Clipboard API'yi dene (ancak iframe'lerde kısıtlı olabilir)
+                try {
+                    await navigator.clipboard.writeText(textarea.value);
+                    await window.customAlert('Veriler panoya kopyalandı!');
+                } catch (err) {
+                    // Eski yöntemi dene
+                    textarea.select();
+                    document.execCommand('copy');
+                    await window.customAlert('Veriler panoya kopyalandı! (Eski yöntem)');
+                }
+            } else {
+                await window.customAlert('Kopyalanacak veri bulunamadı.');
+            }
+        }
+
+        /**
+         * Belirtilen element ID'sine sorunsuz kaydırma yapar.
+         * @param {string} elementId - Kaydırılacak elementin ID'si.
+         */
+        function scrollToElement(elementId) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+
+        // --- RENDER FONKSİYONLARI ---
+        /**
+         * Gelir listesini arayüze render eder.
+         */
+        function renderIncomes() {
+            const list = document.getElementById('incomeList');
+            list.innerHTML = '';
+            data.incomes.sort((a, b) => a.id - b.id).forEach(item => {
+                const color = item.isCash === false ? 'text-blue-700' : 'text-green-700';
+                const sign = item.isCash === false ? '' : '+ ';
+                list.innerHTML += `
+                    <div class="table-row">
+                        <span class="text-gray-600 flex-grow">${item.name}</span>
+                        <span class="font-semibold ${color} mr-2">${sign}${item.amount.toLocaleString('tr-TR')} TL</span>
+                        <button onclick="deleteItem('income', ${item.id})" class="btn-danger">Sil</button>
+                    </div>`;
+            });
+        }
+
+        /**
+         * Sabit gider listesini arayüze render eder.
+         */
+        function renderFixedExpenses() {
+            const list = document.getElementById('fixedExpenseList');
+            list.innerHTML = '';
+            data.fixedExpenses.sort((a, b) => a.id - b.id).forEach(item => {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                let dueDateText = '';
+                let highlightClass = '';
+
+                if (item.nextPaymentDate) {
+                    const itemDate = new Date(item.nextPaymentDate);
+                    itemDate.setHours(0, 0, 0, 0);
+                    const diffTime = itemDate.getTime() - today.getTime();
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                    if (diffDays < 0) {
+                        dueDateText = `<span class="text-xs block overdue-text">Gecikmiş: ${Math.abs(diffDays)} gün önce</span>`;
+                        highlightClass = 'overdue-item';
+                    } else if (diffDays <= 7) { // 7 gün içinde
+                        dueDateText = `<span class="text-xs block due-soon-text">Yaklaşan: ${diffDays} gün kaldı</span>`;
+                        highlightClass = 'due-soon-item';
+                    } else {
+                        dueDateText = `<span class="text-xs block text-gray-500">Ödeme Tarihi: ${item.nextPaymentDate}</span>`;
+                    }
+                }
+
+                list.innerHTML += `
+                    <div class="table-row ${highlightClass}">
+                        <span class="text-gray-600 flex-grow">${item.name} ${dueDateText}</span>
+                        <span class="font-semibold text-red-700 mr-2">- ${item.amount.toLocaleString('tr-TR')} TL</span>
+                        <button onclick="deleteItem('fixed', ${item.id})" class="btn-danger">Sil</button>
+                    </div>`;
+            });
+        }
+        
+        /**
+         * Borçlar ve değişken giderler için giriş satırı oluşturur.
+         * @param {object} item - Veri öğesi (borç veya değişken gider).
+         * @param {string} type - Öğe türü ('debt' veya 'variable').
+         * @returns {string} - Giriş satırı için HTML dizesi.
+         */
+        function createInputRow(item, type) {
+            let infoHtml = '';
+            let highlightClass = '';
+
+            if (type === 'debt') {
+                const suggestedPayment = amortizeLoan(item.principal, item.interestRate, item.term);
+                infoHtml = `
+                    ${item.info ? `<span class="text-xs block text-blue-500">${item.info}</span>` : ''}
+                    ${item.principal > 0 && item.term > 0 && suggestedPayment > 0 ?
+                       `<span class="text-xs block text-purple-600">Önerilen Aylık Ödeme: ${suggestedPayment.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} TL</span>` : ''
+                    }
+                `;
+
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                if (item.nextPaymentDate) {
+                    const itemDate = new Date(item.nextPaymentDate);
+                    itemDate.setHours(0, 0, 0, 0);
+                    const diffTime = itemDate.getTime() - today.getTime();
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                    if (diffDays < 0) {
+                        infoHtml += `<span class="text-xs block overdue-text">Gecikmiş: ${Math.abs(diffDays)} gün önce (Son Ödeme: ${item.nextPaymentDate})</span>`;
+                        highlightClass = 'overdue-item';
+                    } else if (diffDays <= 7) { // 7 gün içinde
+                        infoHtml += `<span class="text-xs block due-soon-text">Yaklaşan: ${diffDays} gün kaldı (Son Ödeme: ${item.nextPaymentDate})</span>`;
+                        highlightClass = 'due-soon-item';
+                    } else {
+                        infoHtml += `<span class="text-xs block text-gray-500">Son Ödeme: ${item.nextPaymentDate}</span>`;
+                    }
+                }
+
+            } else if (type === 'variable') {
+                infoHtml = `${item.info ? `<span class="text-xs block text-blue-500">${item.info}</span>` : ''}`;
+            }
+
+            return `
+                <div class="table-row ${highlightClass}">
+                    <label for="${type}-${item.id}" class="text-gray-600 w-2/3">${item.name}
+                        ${infoHtml}
+                    </label>
+                    <div class="relative w-1/3 flex items-center">
+                        <input id="${type}-${item.id}" type="number" class="input-field text-right pr-10" 
+                                placeholder="0" value="${type === 'debt' ? item.payment : item.amount}" 
+                                oninput="updateAmount('${type}', ${item.id}, this.value)">
+                        <span class="currency"></span>
+                        <button onclick="deleteItem('${type}', ${item.id})" class="btn-danger ml-2">Sil</button>
+                    </div>
+                </div>`;
+        }
+
+        /**
+         * Borç listesini arayüze render eder.
+         */
+        function renderDebts() {
+            const list = document.getElementById('debtList');
+            list.innerHTML = '';
+            data.debts.sort((a, b) => a.id - b.id).forEach(item => list.innerHTML += createInputRow(item, 'debt'));
+            checkDueDatesAndDisplayWarnings(); // Borçlar render edildiğinde uyarıları da kontrol et
+        }
+
+        /**
+         * Değişken gider listesini kategoriye göre gruplandırarak arayüze render eder.
+         */
+        function renderVariableExpenses() {
+            const list = document.getElementById('variableExpenseList');
+            list.innerHTML = '';
+            
+            // Giderleri kategoriye göre grupla
+            const groupedExpenses = data.variableExpenses.reduce((acc, item) => {
+                const category = item.category || 'Diğer'; // Varsayılan kategori
+                if (!acc[category]) {
+                    acc[category] = [];
+                }
+                acc[category].push(item);
+                return acc;
+            }, {});
+
+            // Kategorileri alfabetik olarak sırala
+            const sortedCategories = Object.keys(groupedExpenses).sort();
+
+            sortedCategories.forEach(category => {
+                list.innerHTML += `<h3 class="text-md font-semibold mt-4 mb-2 text-gray-700">${category}</h3>`;
+                groupedExpenses[category].sort((a, b) => a.id - b.id).forEach(item => {
+                    list.innerHTML += createInputRow(item, 'variable');
+                });
+            });
+        }
+
+        /**
+         * Ekstre listesini arayüze render eder.
+         */
+        function renderStatements() {
+            const list = document.getElementById('statementList');
+            list.innerHTML = '';
+            data.statements.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(item => { // Tarihe göre azalan sırala
+                list.innerHTML += `
+                    <div class="table-row items-start">
+                        <div class="flex-grow">
+                            <span class="font-semibold text-gray-700">${item.name}</span>
+                            <span class="text-sm text-gray-500 block">${item.date}</span>
+                            <p class="text-sm text-gray-600 mt-1">${item.content}</p>
+                        </div>
+                        <button onclick="deleteItem('statement', ${item.id})" class="btn-danger ml-2">Sil</button>
+                    </div>`;
+            });
+        }
+
+        /**
+         * Yaklaşan veya gecikmiş ödemeleri kontrol eder ve uyarıları görüntüler.
+         */
+        function checkDueDatesAndDisplayWarnings() {
+            const warningsList = document.getElementById('warningsList');
+            warningsList.innerHTML = '';
+            let hasWarnings = false;
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Sadece tarihi karşılaştır
+
+            const allDueItems = [];
+
+            // Sabit Giderler için kontrol
+            data.fixedExpenses.forEach(item => {
+                if (item.nextPaymentDate) {
+                    const itemDate = new Date(item.nextPaymentDate);
+                    itemDate.setHours(0, 0, 0, 0);
+                    const diffTime = itemDate.getTime() - today.getTime();
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                    if (diffDays < 0) {
+                        allDueItems.push({
+                            name: item.name,
+                            type: 'Sabit Gider',
+                            date: item.nextPaymentDate,
+                            status: 'Gecikmiş',
+                            daysAgo: Math.abs(diffDays)
+                        });
+                        hasWarnings = true;
+                    } else if (diffDays <= 7) {
+                        allDueItems.push({
+                            name: item.name,
+                            type: 'Sabit Gider',
+                            date: item.nextPaymentDate,
+                            status: 'Yaklaşan',
+                            daysLeft: diffDays
+                        });
+                        hasWarnings = true;
+                    }
+                }
+            });
+
+            // Borçlar için kontrol
+            data.debts.forEach(item => {
+                if (item.nextPaymentDate) {
+                    const itemDate = new Date(item.nextPaymentDate);
+                    itemDate.setHours(0, 0, 0, 0);
+                    const diffTime = itemDate.getTime() - today.getTime();
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                    if (diffDays < 0) {
+                        allDueItems.push({
+                            name: item.name,
+                            type: 'Borç Ödemesi',
+                            date: item.nextPaymentDate,
+                            status: 'Gecikmiş',
+                            daysAgo: Math.abs(diffDays)
+                        });
+                        hasWarnings = true;
+                    } else if (diffDays <= 7) {
+                        allDueItems.push({
+                            name: item.name,
+                            type: 'Borç Ödemesi',
+                            date: item.nextPaymentDate,
+                            status: 'Yaklaşan',
+                            daysLeft: diffDays
+                        });
+                        hasWarnings = true;
+                    }
+                }
+            });
+
+            if (hasWarnings) {
+                // Uyarıları tarihe göre sırala (geçmişten geleceğe)
+                allDueItems.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+                allDueItems.forEach(warning => {
+                    let warningMessage = '';
+                    let colorClass = '';
+                    if (warning.status === 'Gecikmiş') {
+                        warningMessage = `<strong>${warning.name}</strong> (${warning.type}): Gecikmiş! ${warning.daysAgo} gün önce (${warning.date})`;
+                        colorClass = 'overdue-text';
+                    } else { // Yaklaşan
+                        warningMessage = `<strong>${warning.name}</strong> (${warning.type}): Yaklaşıyor! ${warning.daysLeft} gün kaldı (${warning.date})`;
+                        colorClass = 'due-soon-text';
+                    }
+                    warningsList.innerHTML += `<p class="text-sm ${colorClass}">${warningMessage}</p>`;
+                });
+            } else {
+                warningsList.innerHTML = '<p class="text-gray-500">Yaklaşan veya gecikmiş ödeme bulunmamaktadır.</p>';
+            }
+        }
+
+
+        // --- HESAPLAMA VE GÜNCELLEME FONKSİYONLARI ---
+        /**
+         * Aylık bütçe özetini hesaplar ve günceller.
+         */
+        function calculateSummary() {
+            const totalIncome = data.incomes.filter(i => i.isCash !== false).reduce((sum, item) => sum + item.amount, 0);
+            const totalFixed = data.fixedExpenses.reduce((sum, item) => sum + item.amount, 0);
+            const totalDebt = data.debts.reduce((sum, item) => sum + item.payment, 0);
+            const totalVariable = data.variableExpenses.reduce((sum, item) => sum + item.amount, 0);
+            
+            const totalExpenses = totalFixed + totalDebt + totalVariable;
+            const netAmount = totalIncome - totalExpenses;
+
+            document.getElementById('summary-income').textContent = totalIncome.toLocaleString('tr-TR', { style: 'currency', currency: 'TRY' });
+            document.getElementById('summary-expenses').textContent = totalExpenses.toLocaleString('tr-TR', { style: 'currency', currency: 'TRY' });
+            
+            const summaryNetEl = document.getElementById('summary-net');
+            summaryNetEl.textContent = netAmount.toLocaleString('tr-TR', { style: 'currency', currency: 'TRY' });
+            summaryNetEl.classList.remove('text-green-600', 'text-red-600', 'text-gray-800');
+            if (netAmount > 0) summaryNetEl.classList.add('text-green-600');
+            else if (netAmount < 0) summaryNetEl.classList.add('text-red-600');
+            else summaryNetEl.classList.add('text-gray-800');
+        }
+
+        /**
+         * Belirli bir borç veya değişken gider öğesinin miktarını günceller.
+         * @param {string} type - Öğe türü ('debt' veya 'variable').
+         * @param {number} id - Öğenin benzersiz kimliği.
+         * @param {string} value - Miktar/ödeme için yeni değer.
+         */
+        function updateAmount(type, id, value) {
+            let list;
+            let property;
+            if (type === 'debt') {
+                list = data.debts;
+                property = 'payment';
+            } else {
+                list = data.variableExpenses;
+                property = 'amount';
+            }
+            const numericValue = parseFloat(value) || 0;
+            const item = list.find(i => i.id === id);
+            if (item) {
+                item[property] = numericValue;
+                saveDataToLocalStorage(); // Veriyi kaydet
+                calculateSummary(); // Özeti yeniden hesapla
+            }
+        }
+        
+        /**
+         * Tüm listeleri render eder ve özeti yeniden hesaplar.
+         */
+        function renderAll() {
+            renderIncomes();
+            renderFixedExpenses();
+            renderDebts();
+            renderVariableExpenses();
+            renderStatements();
+            calculateSummary();
+            checkDueDatesAndDisplayWarnings(); // Tüm render işlemleri bittikten sonra uyarıları kontrol et
+        }
+
+        // --- YÖNETİCİ PANELİ FONKSİYONLARI ---
+        /**
+         * Yeni bir öğe (gelir, sabit gider, borç, değişken gider veya ekstre) ekler.
+         * @param {string} type - Eklenecek öğenin türü ('income', 'fixed', 'debt', 'variable', 'statement').
+         */
+        async function addItem(type) {
+            let nameInput, amountInput, infoInput, categoryInput, principalInput, interestInput, termInput, dateInput, contentInput, list, newItem;
+            const id = Date.now(); // Benzersiz kimlik
+
+            switch(type) {
+                case 'income':
+                    nameInput = document.getElementById('adminIncomeName');
+                    amountInput = document.getElementById('adminIncomeAmount');
+                    list = data.incomes;
+                    if (!nameInput.value || !amountInput.value) {
+                        await window.customAlert('Lütfen gelir adı ve tutarı doldurun.');
+                        return;
+                    }
+                    newItem = { id, name: nameInput.value, amount: parseFloat(amountInput.value) || 0, isCash: true };
+                    break;
+                case 'fixed':
+                    nameInput = document.getElementById('adminFixedExpenseName');
+                    amountInput = document.getElementById('adminFixedExpenseAmount');
+                    dateInput = document.getElementById('adminFixedExpenseDate'); // Yeni: Tarih alanı
+                    list = data.fixedExpenses;
+                    if (!nameInput.value || !amountInput.value || !dateInput.value) {
+                        await window.customAlert('Lütfen gider adı, tutarı ve ödeme tarihini doldurun.');
+                        return;
+                    }
+                    newItem = { id, name: nameInput.value, amount: parseFloat(amountInput.value) || 0, nextPaymentDate: dateInput.value }; // Yeni alan
+                    break;
+                case 'debt':
+                    nameInput = document.getElementById('adminDebtName');
+                    principalInput = document.getElementById('adminDebtPrincipal');
+                    interestInput = document.getElementById('adminDebtInterestRate');
+                    termInput = document.getElementById('adminDebtTerm');
+                    dateInput = document.getElementById('adminDebtDate'); // Yeni: Tarih alanı
+                    infoInput = document.getElementById('adminDebtInfo');
+                    list = data.debts;
+                    if (!nameInput.value || !principalInput.value || !interestInput.value || !termInput.value || !dateInput.value) {
+                        await window.customAlert('Lütfen borç adı, anapara, faiz oranı, vade ve son ödeme tarihini doldurun.');
+                        return;
+                    }
+                    newItem = { 
+                        id, 
+                        name: nameInput.value, 
+                        principal: parseFloat(principalInput.value) || 0,
+                        interestRate: parseFloat(interestInput.value) || 0,
+                        term: parseInt(termInput.value) || 0,
+                        nextPaymentDate: dateInput.value, // Yeni alan
+                        info: infoInput.value, 
+                        payment: 0 // Varsayılan mevcut ay ödemesini 0 yap
+                    };
+                    break;
+                case 'variable':
+                    nameInput = document.getElementById('adminVarExpenseName');
+                    categoryInput = document.getElementById('adminVarExpenseCategory');
+                    infoInput = document.getElementById('adminVarExpenseInfo');
+                    list = data.variableExpenses;
+                    if (!nameInput.value) {
+                        await window.customAlert('Lütfen harcama adını doldurun.');
+                        return;
+                    }
+                    newItem = { id, name: nameInput.value, category: categoryInput.value || 'Genel', info: infoInput.value, amount: 0 };
+                    break;
+                case 'statement':
+                    nameInput = document.getElementById('adminStatementName');
+                    dateInput = document.getElementById('adminStatementDate');
+                    contentInput = document.getElementById('adminStatementContent');
+                    list = data.statements;
+                    if (!nameInput.value || !dateInput.value || !contentInput.value) {
+                        await window.customAlert('Lütfen ekstre adı, tarihi ve içeriği doldurun.');
+                        return;
+                    }
+                    newItem = { id, name: nameInput.value, date: dateInput.value, content: contentInput.value };
+                    break;
+                default:
+                    return;
+            }
+
+            list.push(newItem);
+            saveDataToLocalStorage(); // Veriyi kaydet
+            // Girişleri temizle
+            if (nameInput) nameInput.value = '';
+            if (amountInput) amountInput.value = '';
+            if (infoInput) infoInput.value = '';
+            if (categoryInput) categoryInput.value = '';
+            if (principalInput) principalInput.value = '';
+            if (interestInput) interestInput.value = '';
+            if (termInput) termInput.value = '';
+            // Düzeltildi: dateInput'un sadece tanımlı olduğu yerlerde değerini temizle
+            if (type === 'fixed' || type === 'debt' || type === 'statement') {
+                dateInput.value = '';
+            }
+            if (contentInput) contentInput.value = '';
+
+            renderAll(); // Tüm bölümleri yeniden render et
+        }
+        
+        /**
+         * Bir öğeyi siler.
+         * @param {string} type - Silinecek öğenin türü ('income', 'fixed', 'debt', 'variable', 'statement').
+         * @param {number} id - Silinecek öğenin benzersiz kimliği.
+         */
+        async function deleteItem(type, id) {
+            const confirmed = await window.customConfirm('Bu öğeyi silmek istediğinizden emin misiniz?');
+            if (!confirmed) return;
+            
+            switch(type) {
+                case 'income': data.incomes = data.incomes.filter(i => i.id !== id); break;
+                case 'fixed': data.fixedExpenses = data.fixedExpenses.filter(i => i.id !== id); break;
+                case 'debt': data.debts = data.debts.filter(i => i.id !== id); break;
+                case 'variable': data.variableExpenses = data.variableExpenses.filter(i => i.id !== id); break;
+                case 'statement': data.statements = data.statements.filter(i => i.id !== id); break;
+            }
+            saveDataToLocalStorage(); // Veriyi kaydet
+            renderAll(); // Tüm bölümleri yeniden render et
+        }
+
+        /**
+         * Kredi risk raporu verilerini JSON dizesinden içe aktarır.
+         * @returns {Promise<void>}
+         */
+        async function importRiskReport() {
+            const jsonString = document.getElementById('adminRiskReportJson').value;
+            if (!jsonString) {
+                await window.customAlert('Lütfen içe aktarılacak JSON verisini yapıştırın.');
+                return;
+            }
+
+            try {
+                const report = JSON.parse(jsonString);
+
+                // --- Finansal Özet Bölümünü Güncelle ---
+                if (report.findeksScore !== undefined) {
+                    document.getElementById('summary-findeks-score').textContent = report.findeksScore;
+                }
+                if (report.findeksRiskLevel !== undefined) {
+                    document.getElementById('summary-findeks-risk').textContent = `(${report.findeksRiskLevel})`;
+                }
+                if (report.totalDebt !== undefined) {
+                    document.getElementById('summary-total-debt').textContent = report.totalDebt.toLocaleString('tr-TR') + ' TL';
+                }
+                if (report.totalLimit !== undefined) {
+                    document.getElementById('summary-total-limit').textContent = report.totalLimit.toLocaleString('tr-TR') + ' TL';
+                }
+                if (report.totalDebt !== undefined && report.totalLimit !== undefined && report.totalLimit > 0) {
+                    const ratio = ((report.totalDebt / report.totalLimit) * 100).toFixed(0);
+                    document.getElementById('summary-debt-limit-ratio').textContent = `%${ratio}`;
+                }
+
+                // --- Borçları İçe Aktar (rapor JSON'unda varsa) ---
+                if (report.debts && Array.isArray(report.debts)) {
+                    for (const debtItem of report.debts) {
+                        const newDebt = {
+                            id: Date.now(), // Client-side sıralama için benzersiz kimlik
+                            name: debtItem.name || 'Bilinmeyen Borç',
+                            principal: parseFloat(debtItem.principal) || 0,
+                            interestRate: parseFloat(debtItem.interestRate) || 0,
+                            term: parseInt(debtItem.term) || 0,
+                            nextPaymentDate: debtItem.nextPaymentDate || '', // Yeni: nextPaymentDate
+                            info: debtItem.info || '',
+                            payment: parseFloat(debtItem.payment) || 0 // Rapor anında ödeme varsa kullan, yoksa 0
+                        };
+                        data.debts.push(newDebt);
+                    }
+                    await window.customAlert('Risk raporu başarıyla içe aktarıldı ve borçlar eklendi.');
+                } else {
+                    await window.customAlert('Risk raporu başarıyla içe aktarıldı. Detaylı borç verisi bulunamadı veya geçersiz format.');
+                }
+
+                document.getElementById('adminRiskReportJson').value = ''; // Metin alanını temizle
+                saveDataToLocalStorage(); // Veriyi kaydet
+                renderAll(); // Değişiklikleri yansıtmak için her şeyi yeniden render et
+            } catch (error) {
+                console.error("Risk raporu ayrıştırılırken veya içe aktarılırken hata oluştu:", error);
+                await window.customAlert('JSON formatı geçersiz veya bir hata oluştu: ' + error.message);
+            }
+        }
+
+        /**
+         * Tüm bütçe verilerini localStorage'dan alıp bir textarea'ya JSON olarak yazar.
+         */
+        async function exportAllData() {
+            try {
+                const jsonData = JSON.stringify(data, null, 2); // Pretty print for readability
+                document.getElementById('exportDataJson').value = jsonData;
+                await window.customAlert('Veriler dışa aktarıldı. Yukarıdaki kutudan kopyalayabilirsiniz.');
+            } catch (error) {
+                console.error("Veri dışa aktarılırken hata oluştu:", error);
+                await window.customAlert('Veri dışa aktarılırken bir hata oluştu.');
+            }
+        }
+
+        /**
+         * Tüm verileri dışa aktarır ve dışa aktarma hatırlatıcısını gizler.
+         */
+        async function exportAllDataAndDismissReminder() {
+            await exportAllData(); // Normal dışa aktarma işlemini çağır
+            dismissWeeklyExportReminder(); // Hatırlatıcıyı gizle
+            scrollToElement('adminPanel'); // Dışa aktarma alanına kaydır
+        }
+
+        /**
+         * Bir textarea'dan JSON verisini okur ve tüm bütçe verilerini bununla değiştirir.
+         */
+        async function importAllData() {
+            const jsonString = document.getElementById('importDataJson').value;
+            if (!jsonString) {
+                await window.customAlert('Lütfen içe aktarılacak JSON verisini yapıştırın.');
+                return;
+            }
+
+            const confirmed = await window.customConfirm('Mevcut tüm verilerinizin üzerine yazılacak. Devam etmek istiyor musunuz?');
+            if (!confirmed) return;
+
+            try {
+                const importedData = JSON.parse(jsonString);
+
+                // Temel doğrulama: Gerekli anahtar kelimelerin varlığını kontrol et
+                if (importedData && typeof importedData === 'object' &&
+                    Array.isArray(importedData.incomes) &&
+                    Array.isArray(importedData.fixedExpenses) &&
+                    Array.isArray(importedData.debts) &&
+                    Array.isArray(importedData.variableExpenses) &&
+                    Array.isArray(importedData.statements))
+                {
+                    data = importedData; // Tüm veriyi değiştir
+                    saveDataToLocalStorage(); // Yeni veriyi kaydet
+                    renderAll(); // Her şeyi yeniden render et
+                    await window.customAlert('Tüm veriler başarıyla içe aktarıldı!');
+                } else {
+                    await window.customAlert('Geçersiz JSON formatı. Lütfen doğru bütçe verisi JSON yapısını kullandığınızdan emin olun.');
+                }
+                document.getElementById('importDataJson').value = ''; // Metin alanını temizle
+
+            } catch (error) {
+                console.error("Veri içe aktarılırken hata oluştu:", error);
+                await window.customAlert('Veri içe aktarılırken bir hata oluştu: ' + error.message);
+            }
+        }
+
+        // --- HAFTALIK DIŞA AKTARMA HATIRLATICI İŞLEVSELLİĞİ ---
+        const ONE_WEEK_IN_MS = 7 * 24 * 60 * 60 * 1000; // 7 gün milisaniye cinsinden
+
+        /**
+         * Haftalık dışa aktarma hatırlatıcısını kontrol eder ve gerektiğinde gösterir.
+         */
+        function checkWeeklyExportReminder() {
+            const lastReminderDate = localStorage.getItem('lastExportReminderShown');
+            const reminderElement = document.getElementById('weeklyExportReminder');
+
+            if (!lastReminderDate) {
+                // Hiç hatırlatılmamışsa, hemen göster (veya ilk yüklemede gizleyip bir hafta sonra göster)
+                // İlk kurulumda hemen görünmesini istemiyorsak, burayı Date.now() ile başlatabiliriz.
+                // localStorage.setItem('lastExportReminderShown', Date.now());
+                // reminderElement.classList.add('hidden'); // İlk kurulumda gizle
+                reminderElement.classList.remove('hidden'); // Hemen göster
+            } else {
+                const lastDate = parseInt(lastReminderDate, 10);
+                if (Date.now() - lastDate >= ONE_WEEK_IN_MS) {
+                    reminderElement.classList.remove('hidden'); // Bir hafta geçmişse göster
+                } else {
+                    reminderElement.classList.add('hidden'); // Henüz bir hafta geçmemişse gizle
+                }
+            }
+        }
+
+        /**
+         * Haftalık dışa aktarma hatırlatıcısını gizler ve bir sonraki hafta için ayarlar.
+         */
+        function dismissWeeklyExportReminder() {
+            localStorage.setItem('lastExportReminderShown', Date.now());
+            document.getElementById('weeklyExportReminder').classList.add('hidden');
+            window.customAlert('Hatırlatıcı bu hafta için gizlendi.');
+        }
+
+
+        // --- BAŞLATMA ---
+        // Yönetici paneli görünürlüğünü açma/kapama olay dinleyicisi
+        document.getElementById('toggleAdminPanel').addEventListener('change', (event) => {
+            const panel = document.getElementById('adminPanel');
+            if (event.target.checked) {
+                panel.style.display = 'block';
+            } else {
+                panel.style.display = 'none';
+            }
+        });
+
+        // Pencere yüklendiğinde verileri yükle, render et ve hatırlatıcıyı kontrol et
+        window.addEventListener('load', () => {
+            loadDataFromLocalStorage();
+            renderAll();
+            checkWeeklyExportReminder();
+        });
+    </script>
+</body>
+</html>
