@@ -48,3 +48,17 @@ jspm_packages/
 
 # User data
 userData/
+
+# ================================================
+# DOCUMENTATION & INSTRUCTIONS EXCEPTIONS
+# ================================================
+# Dokümantasyon ve instruction dosyaları git'e dahil edilsin
+!.github/documentation/
+!.github/documentation/*.md
+!.github/instructions/
+!.github/instructions/*.md
+!.github/instructions/*.instructions.md
+
+# README ve proje dokümantasyonu dahil edilsin  
+!README.md
+!*.md

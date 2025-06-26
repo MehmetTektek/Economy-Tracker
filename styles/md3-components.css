@@ -1,0 +1,410 @@
+/**
+ * Material Design 3 Bileşen Stilleri
+ * MD3 kurallarına uygun tutarlı bileşen implementasyonları
+ * Google'ın Material Design 3 spesifikasyonlarına dayalı
+ * 
+ * İçerilen Bileşenler:
+ * - Button Sistemi (filled, outlined, text, elevated, tonal)
+ * - Form Bileşenleri (input, switch, checkbox)
+ * - Kart Bileşenleri
+ * - Navigasyon Bileşenleri
+ */
+
+ /* Buton Stilleri */
+
+    .md3-button {
+
+        /* Layout */
+        display: inline-flex;  /* Modern layout için inline-flex kullanıldı */
+        align-items: center;  /* Tüm içerikleri dikey olarak ortala */
+        justify-content: center;  /* İçerikleri yatay olarak ortala */
+        gap: var(--md-sys-spacing-2);  /* Ikon ve metin arasında 8px boşluk */
+        
+        /* Kutu Modeli */
+        padding: 10px 24px;  /* MD3 spesifikasyonuna göre 10px üst-alt, 24px sağ-sol */
+        border-radius: 20px;  /* MD3 için yuvarlak köşeler */
+        border: none;  /* Varsayılan kenarlık kaldırıldı */
+        min-width: 64px;  /* Minimum genişlik 64px */
+        min-height: 40px;  /* Minimum yükseklik 40px */
+
+        /* Metin Stilleri */
+        font-family: var(--md-sys-typescale-label-large-font);  /* MD3 tipografi için Roboto */
+        font-size: var(--md-sys-typescale-label-large-size);  /* 14px */
+        font-weight: var(--md-sys-typescale-label-large-weight);  /* 500 */
+        line-height: var(--md-sys-typescale-label-large-line-height);  /* 20px */
+        letter-spacing: var(--md-sys-typescale-label-large-letter-spacing);  /* 0.1px */
+        text-decoration: none;  /* Metin altı kaldırıldı */
+
+        /* Etkileşim Stilleri */
+        cursor: pointer;  /* Fare imleci üzerine geldiğinde el işareti */
+        user-select: none;  /* Metin seçimi engellendi */
+        outline: none;  /* Odaklandığında kenarlık gösterilmedi */
+
+        /* Animasyon */
+        transition: all var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);  /* Tüm özellikler için 200ms animasyon */
+        /*         ↑                    ↑                              ↑
+        Tüm props          200ms (design token)        cubic-bezier easing  */
+        
+        /* Ripple Efekti */
+        position: relative;  /* Ripple için konumlandırma */
+        overflow: hidden;  /* Ripple dışarı taşmasın */
+    }
+
+ /* Filled Buton Stili */
+    .md3-button--filled {
+        background-color: var(--md-sys-color-primary);  /* Temel arka plan rengi */
+        color: var(--md-sys-color-on-primary);  /* Metin rengi */
+
+        box-shadow: var(--md-sys-elevation-level0);  /* Hafif gölge efekti */
+    }
+
+    /* Filled Buton Hover Stili */
+    .md3-button--filled:hover {
+        background-color: color-mix(in srgb, var(--md-sys-color-primary) 92%, var(--md-sys-color-on-primary));  /* Hover efekti */
+
+        box-shadow: var(--md-sys-elevation-level1);  /* Hover sırasında hafif gölge */
+    }
+
+/* Focus Durumu - Erişilebilirlik */
+.md3-button--filled:focus-visible {
+    /* 🔍 FOCUS HALKASI */
+    box-shadow: var(--md-sys-elevation-level1), 
+                0 0 0 3px color-mix(in srgb, var(--md-sys-color-primary) 12%, transparent);
+    /*                    ↑                                                ↑
+                     3px halka genişliği                               %12 opaklık focus halkası */
+}
+
+/* Active Durumu */
+.md3-button--filled:active {
+    /* Basılıyken arka plan rengi */
+    background-color: color-mix(in srgb, var(--md-sys-color-primary) 88%, var(--md-sys-color-on-primary));
+    /*                    ↑                                                ↑
+                     %88 opaklık aktif durumu */
+
+    /* Yükselti azalışu */
+    box-shadow: var(--md-sys-elevation-level0);  /* Basılıyken düzleş */
+
+    /* Ölçek geri bildirimi */
+    transform: scale(0.98);  /* %2 küçültme */
+}
+
+/* Devre dışı durumu */
+.md3-button--filled:disabled {
+    /* Devre dışı bırakıldığında arka plan rengi */
+    background-color: color-mix(in srgb, var(--md-sys-color-on-surface) 12%, transparent);
+    color: color-mix(in srgb, var(--md-sys-color-on-surface) 38%, transparent);
+    /*                    ↑                                                ↑
+                     %12 opaklık devre dışı durumu */
+
+    /* Etkileşim engelleme */
+    cursor: not-allowed;  /* Fare imleci engellendi */
+    pointer-events: none;  /* Tıklanabilirlik engellendi */
+
+    /* Yükselti kaldırma */
+    box-shadow: none;  /* Gölge kaldırıldı */
+}
+
+/* === OUTLINED BUTON STILI === */
+.md3-button--outlined {
+    background-color: transparent;
+    border: 1px solid var(--md-sys-color-outline);
+    color: var(--md-sys-color-primary);
+}
+
+/* Hover durumu */
+.md3-button--outlined:hover:not(:disabled) {
+    background-color: color-mix(in srgb, var(--md-sys-color-primary) 8%, transparent);
+    border-color: var(--md-sys-color-primary);
+}
+
+/* Focus durumu */
+.md3-button--outlined:focus-visible {
+    outline: 2px solid var(--md-sys-color-primary);
+    outline-offset: 2px;
+}
+
+/* Devre dışı durumu */
+.md3-button--outlined:disabled {
+    background-color: transparent;
+    border-color: color-mix(in srgb, var(--md-sys-color-on-surface) 12%, transparent);
+    color: color-mix(in srgb, var(--md-sys-color-on-surface) 38%, transparent);
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* === TEXT BUTON STILI === */
+.md3-button--text {
+    /* Baseline ayarları */
+    background-color: transparent;  /* Arka plan rengi yok */
+    border: none;  /* Kenar çizgisi yok */
+    color: var(--md-sys-color-primary);  /* Metin rengi */
+    padding: var(--md-sys-spacing-2) var(--md-sys-spacing-2);  /* 8px yatay boşluk */
+}
+
+/* Hover durumu */
+.md3-button--text:hover:not(:disabled) {
+    background-color: color-mix(in srgb, var(--md-sys-color-primary) 4%, transparent);  /* Hover efekti */
+}
+
+/* Focus durumu */
+.md3-button--text:focus-visible {
+    outline: 2px solid var(--md-sys-color-primary);  /* Focus halkası */
+    outline-offset: 2px;  /* Focus halkası kenar boşluğu */
+}
+
+/* Aktif durumu */
+.md3-button--text:active {
+    background-color: color-mix(in srgb, var(--md-sys-color-primary) 8%, transparent);  /* Aktif durum efekti */
+}
+
+/* Devre dışı durumu */
+.md3-button--text:disabled {
+    color: var(--md-sys-color-on-surface-variant);  /* Devre dışı metin rengi */
+    opacity: 0.38;  /* %38 opaklık */
+    pointer-events: none;  /* Tıklanabilirlik engellendi */
+    cursor: not-allowed;  /* Fare imleci engellendi */
+}
+
+/* === ELEVATED BUTON STILI === */
+.md3-button--elevated {
+    /* Baseline ayarları */
+    background-color: var(--md-sys-color-surface);  /* Temel arka plan */
+    color: var(--md-sys-color-primary);  /* Metin rengi */
+    border: none;  /* Kenar çizgisi yok */
+    box-shadow: var(--md-sys-elevation-level1);  /* Hafif gölge efekti */
+}
+
+/* Hover durumu */
+.md3-button--elevated:hover:not(:disabled) {
+    box-shadow: var(--md-sys-elevation-level2);  /* Hover sırasında gölge artar */
+    background-color: color-mix(in srgb, var(--md-sys-color-primary) 10%, var(--md-sys-color-surface));  /* Hover efekti */
+}
+
+/* Focus durumu */
+.md3-button--elevated:focus-visible {
+    outline: 2px solid var(--md-sys-color-primary);  /* Focus halkası */
+    outline-offset: 2px;  /* Focus halkası kenar boşluğu */
+    box-shadow: var(--md-sys-elevation-level2);
+}
+
+/* Aktif durumu */
+.md3-button--elevated:active {
+    box-shadow: var(--md-sys-elevation-level1);  /* Basılıyken gölge azalır */
+    transform: translateY(1px);  /* %1 yukarı kaydırma */
+    background-color: color-mix(in srgb, var(--md-sys-color-primary) 10%, var(--md-sys-color-surface));  /* Aktif durum efekti */ 
+}
+
+/* Devre dışı durumu */
+.md3-button--elevated:disabled {
+    background-color: var(--md-sys-color-on-surface);  /* Devre dışı arka plan rengi */
+    color: var(--md-sys-color-on-surface-variant);  /* Devre dışı metin rengi */
+    box-shadow: none;  /* Gölge kaldırıldı */
+    pointer-events: none;  /* Tıklanabilirlik engellendi */
+    cursor: not-allowed;  /* Fare imleci engellendi */
+    opacity: 0.12;  /* %12 opaklık */
+}
+
+/* === TONAL BUTON STILI === */
+.md3-button--tonal {
+    /* Baseline ayarları */
+    background-color: var(--md-sys-color-primary-container);  /* Temel arka plan */
+    color: var(--md-sys-color-on-primary-container);  /* Metin rengi */
+    border: none;  /* Kenar çizgisi yok */
+}
+
+/* Hover durumu - Subtle Elevation + Color Shifti */
+.md3-button--tonal:hover:not(:disabled) {
+    background-color: color-mix(in srgb, var(--md-sys-color-primary-container) 8%, var(--md-sys-color-on-primary-container));  /* Hover efekti */
+    box-shadow: var(--md-sys-elevation-level1);  /* Hover sırasında hafif gölge */
+}
+
+/* Focus durumu - Primary Outline */
+.md3-button--tonal:focus-visible {
+    outline: 2px solid var(--md-sys-color-primary);  /* Focus halkası */
+    outline-offset: 2px;  /* Focus halkası kenar boşluğu */
+}
+
+/* Aktif durumu - Deeper Color Shift */
+.md3-button--tonal:active {
+    background-color: color-mix(in srgb, var(--md-sys-color-on-primary-container) 12%, var(--md-sys-color-primary-container));  /* Aktif durum efekti */
+    box-shadow: var(--md-sys-elevation-level0);  /* Basılıyken gölge kaldırılır */
+}
+
+/* Devre dışı durumu - Neutral State */
+.md3-button--tonal:disabled {
+    background-color: var(--md-sys-color-on-surface);  /* Devre dışı arka plan rengi */
+    color: var(--md-sys-color-on-surface-variant);  /* Devre dışı metin rengi */
+    opacity: 0.12;  /* %12 opaklık */
+    pointer-events: none;  /* Tıklanabilirlik engellendi */
+    cursor: not-allowed;  /* Fare imleci engellendi */
+}
+
+/* ================================================
+   PERFORMANCE OPTIMIZATIONS
+   Hardware acceleration and smooth transitions
+   ================================================ */
+
+.md3-button {
+    /* Hardware acceleration triggers */
+    transform: translateZ(0);
+    will-change: transform, box-shadow, background-color;
+    
+    /* Optimized transitions */
+    transition: 
+        background-color 200ms var(--md-sys-motion-easing-standard),
+        box-shadow 200ms var(--md-sys-motion-easing-standard),
+        transform 100ms var(--md-sys-motion-easing-emphasized),
+        border-color 150ms var(--md-sys-motion-easing-standard);
+}
+
+/* Remove will-change after animations complete */
+.md3-button:not(:hover):not(:focus):not(:active) {
+    will-change: auto;
+}
+
+/* ================================================
+   MD3 SWITCH COMPONENT
+================================================ */
+
+.md3-switch {
+    /* Container */
+    display: inline-block;  /* Blok düzende görüntüle */
+    position: relative;  /* İçerik konumlandırma için */
+    width: 52px;  /* Genişlik */
+    height: 32px; /* Yükseklik */
+    cursor: pointer;  /* Tıklanabilir */
+
+    /* Erişebilirlik */
+    -webkit-tap-highlight-color: transparent;  /* Mobil tarayıcılarda dokunma vurgusunu kaldır */
+}
+
+.md3-switch__input {
+    opacity: 0;
+    position: absolute;
+    width: 0;
+    height: 0;
+    margin: 0;
+    padding: 0;
+}
+
+/* Focus state - ayrı selector */
+.md3-switch__input:focus + .md3-switch__track {
+    outline: 2px solid var(--md-sys-color-primary);
+    outline-offset: 2px;
+}
+
+/* Track - ayrı selector */
+.md3-switch__track {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 16px;
+    
+    /* OFF state colors */
+    background-color: var(--md-sys-color-surface-variant);
+    border: 2px solid var(--md-sys-color-outline);
+    
+    /* Smooth transitions */
+    transition: 
+        background-color 200ms var(--md-sys-motion-easing-standard),
+        border-color 200ms var(--md-sys-motion-easing-standard);
+}
+
+/* Handle - ayrı selector */
+.md3-switch__handle {
+    position: absolute;
+    top: 50%;
+    left: 4px;
+    transform: translateY(-50%);
+    
+    /* Handle dimensions - OFF state */
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    
+    /* OFF state colors */
+    background-color: var(--md-sys-color-outline);
+    
+    /* Smooth transitions */
+    transition: 
+        transform 200ms var(--md-sys-motion-easing-emphasized),
+        width 200ms var(--md-sys-motion-easing-standard),
+        height 200ms var(--md-sys-motion-easing-standard),
+        background-color 200ms var(--md-sys-motion-easing-standard);
+    
+    /* Elevation */
+    box-shadow: var(--md-sys-elevation-level1);
+}
+
+/* Ripple efekti */
+.md3-switch__ripple {
+    position: absolute;  /* Konumlandırma */
+    top: 50%;  /* Yatay ortalama */
+    left: 50%;  /* Sol kenar ortalama */
+    transform: translate(-50%, -50%);  /* Dikey ve yatay ortalama */
+    width: 40px; /* Genişlik */
+    height: 40px; /* Yükseklik */
+    border-radius: 50%;  /* Yuvarlak köşeler */
+    background-color: transparent;  /* Arka plan rengi */
+}
+
+/* Hover ripple efekti */
+.md3-switch__ripple:hover {
+    background-color: color-mix(in srgb, var(--md-sys-color-on-surface) 8%, transparent);  /* Hover efekti */
+}
+
+/* Açık durum Stilleri */
+
+/* Track - Açık */
+.md3-switch__input:checked + .md3-switch__track {
+    background-color: var(--md-sys-color-primary);  /* Açık durumda arka plan rengi */
+    border-color: var(--md-sys-color-primary);  /* Kenar çizgisi rengi */
+}
+
+/* Handle - Açık */
+.md3-switch__input:checked + .md3-switch__track .md3-switch__handle {
+    /* Açık durumda handle konumu */
+    transform: translateY(-50%) translateX(20px);  /* %20 sağa kaydırma */
+
+    /* Açık durumda handle boyutu */
+    width: 24px;  /* Genişlik */
+    height: 24px;  /* Yükseklik */
+
+    /* Açık durumda arka plan rengi */
+    background-color: var(--md-sys-color-on-primary);  /* Handle arka plan rengi */
+
+    /* Açık durumda gölge efekti */
+    box-shadow: var(--md-sys-elevation-level2);  /* Hafif gölge efekti */
+}
+
+/* Ripple efekti - Açık */
+.md3-switch__input:checked + .md3-switch__track .md3-switch__ripple {
+    background-color: color-mix(in srgb, var(--md-sys-color-primary) 8%, transparent);  /* Açık durumda ripple efekti */
+}
+
+/* Devre dışı durum Stilleri */
+
+/* Track - Devre dışı */
+.md3-switch__input:disabled + .md3-switch__track {
+
+    background-color: color-mix(in srgb, var(--md-sys-color-on-surface) 12%, transparent);  /* Devre dışı durumda arka plan rengi */
+    border-color: color-mix(in srgb, var(--md-sys-color-on-surface) 12%, transparent);  /* Kenar çizgisi rengi */
+    cursor: not-allowed;  /* Fare imleci engellendi */
+}
+
+/* Handle - Devre dışı */
+.md3-switch__input:disabled + .md3-switch__track .md3-switch__handle {
+    background-color: color-mix(in srgb, var(--md-sys-color-on-surface) 38%, transparent);  /* Devre dışı durumda arka plan rengi */
+    box-shadow: none;  /* Gölge kaldırıldı */
+}
+
+/* Devre dışı "Açık" durumu */
+.md3-switch__input:disabled + .md3-switch__track {
+    background-color: color-mix(in srgb, var(--md-sys-color-on-surface) 12%, transparent);  /* Devre dışı durumda arka plan rengi */
+}
+
+.md3-switch__input:disabled:checked + .md3-switch__track .md3-switch__handle {
+    background-color: var(--md-sys-color-surface);  /* Devre dışı durumda açık durumda arka plan rengi */
+}
