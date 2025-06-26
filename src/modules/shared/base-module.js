@@ -114,7 +114,7 @@ class BaseModule {
         // MD3 temel stillerini uygula
         this.container.classList.add('md3-container');
         this.container.classList.add('module-container');
-        this.container.classList.add('${this.name.toLowerCase()}-module');
+        this.container.classList.add(`${this.name.toLowerCase()}-module`);
 
         // Modül durumuna göre stilleri ayarla
         if (this.isVisible) {
@@ -135,9 +135,59 @@ class BaseModule {
 
     destroy() {
         try {
-            console.log(`🗑️
+            console.log(`🗑️ ${this.name} modülü yok ediliyor...`);
+
+            // Veri doğrulama
+            if (!this.isInitialized) {
+                console.warn(`Modül ${this.name} zaten yok edilmiş.`);
+                return false; // Modül zaten yoksa işlem yapma
+            }
+
+            // Son verileri kaydet
+            if (this.data && Object.keys(this.data).length > 0) {
+                this.saveData();
+                console.log(`💾 ${this.name} - Son veriler kaydedildi`);
+            }
+
+            // Event listenerları temizle
+            this.unbindEvents();
+            console.log(`🗑️ ${this.name} - Event listenerlar temizlendi`)
+            
+            // DOM içeriğini temizle
+            if (this.container) {
+            this.container.innerHTML = '';
+            this.container.classList.remove(
+                'md3-container',
+                'module-container',
+                `${this.name.toLowerCase()}-module`,
+                'module-visible',
+                'module-initialized'
+            );
+            console.log(`🧹 ${this.name} - DOM temizlendi`);
+        }
+        
+        // 4. Durum değişkenlerini sıfırla
+        this.isInitialized = false;
+        this.isVisible = false;
+        this.data = {};
+        this.events = [];
+        
+        // 5. Temizlik sonrası işlemler
+        this.afterDestroy();
+
+        console.log(`🗑️ ${this.name} modülü başarıyla yok edildi.`);
+        return true;
+        
+    } catch (error) {
+            console.error(`🗑️ ${this.name} modülü yok edilirken hata oluştu:`, error)
+            return false; // Hata durumunda false döndür
         }
     }
+
+    afterDestroy() {
+        // Bu method override edilebilir
+        console.log(`🔄 ${this.name} - Yok etme sonrası işlemler`)
+        };
 
     async loadData() {
         try {
