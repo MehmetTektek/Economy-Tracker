@@ -1,4 +1,4 @@
-import { contextBridge, ipcRenderer } from 'electron';
+const { contextBridge, ipcRenderer } = require('electron');
 
 // Webpage ile electron bağlantısı
 contextBridge.exposeInMainWorld('electronAPI', {

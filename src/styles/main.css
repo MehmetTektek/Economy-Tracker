@@ -1,0 +1,6 @@
+/* Ana CSS kontrol dosyası */
+
+/* İçe aktarılan CSS dosyaları */
+@import './core/md3-components.css';
+@import './core/md3-variables.css';
+
