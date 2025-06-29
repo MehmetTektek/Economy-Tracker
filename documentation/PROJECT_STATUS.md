@@ -1,3 +1,9 @@
+## [29.06.2025] Dashboard Son İşlemler MD3 Entegrasyonu
+- Son işlemler (transaction list) artık Dashboard'da MD3 uyumlu, modüler ve renkli ikonlarla gösteriliyor.
+- Material Icons ve renk sistemi, kartlarda olduğu gibi işlem listesinde de kullanıldı.
+- İkonlar ve renkler, gelir/gider tipine göre otomatik atanıyor.
+- Tüm görsel ve fonksiyonel testler başarıyla tamamlandı.
+- Kodda ve şablonlarda MD3 bütünlüğü sağlandı.
 # Economy Tracker - Proje Durum Raporu
 
 **Son Güncelleme:** 29 Haziran 2025

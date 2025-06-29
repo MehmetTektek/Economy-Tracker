@@ -51,10 +51,11 @@ function loadTestData() {
         logToPage('Test verileri yükleniyor...', 'info');
 
         // Dummy data
-                const mockData = {
+        const mockData = {
+            totalIncome: 8500.00,
+            totalExpenses: 3200.75,
+            totalDebt: 0, // veya örnek bir borç
             balance: 15750.50,
-            income: 8500.00,
-            expense: 3200.75,
             transactions: [
                 {
                     id: 1,

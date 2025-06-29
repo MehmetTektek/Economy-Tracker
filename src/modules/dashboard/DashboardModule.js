@@ -71,22 +71,19 @@ class DashboardModule extends BaseModule {
     // Dashboard verilerini yükle
    async loadDashboardData() {
     try {
+        // Sadece BaseModule'den veriyi yükle
         await this.loadData();
-        const savedData = this.data
-        
-        if (savedData) {
-            this.dashboardData = { ...this.dashboardData, ...savedData };
-        }
-        
+        // dashboardData'yı güncelle
+        this.dashboardData = { ...this.dashboardData, ...this.data };
         // Finansal özet hesapla
         this.calculateFinancialSummary();
-        
+        // Arayüzü güncelle
+        this.render();
         console.log("Dashboard verileri yüklendi:", this.dashboardData);
-
         } catch (error) {
             console.error("Dashboard verileri yüklenirken hata oluştu:", error);
         }
-    } 
+    }
 
     // Finansal özet hesapla
     calculateFinancialSummary() {
@@ -119,6 +116,15 @@ class DashboardModule extends BaseModule {
         this.attachDashboardEvents();
 
         console.log("Dashboard modülü render edildi");
+
+        const transactionsListDiv = this.container.querySelector('.transactions-list');
+        transactionsListDiv.innerHTML = ''; // Önce temizle
+        if (this.dashboardData.transactions && this.dashboardData.transactions.length > 0) {
+            const listElement = this.createRecentTransactions(this.dashboardData.transactions);
+            transactionsListDiv.appendChild(listElement);
+        } else {
+            transactionsListDiv.innerHTML = '<div class="md3-card transaction-item"><div class="transaction-content"><span class="md3-body-medium">Henüz işlem bulunmuyor</span><span class="md3-body-small">Gelir veya gider ekleyerek başlayın</span></div></div>';
+        }
         return
     }   catch (error) {
             console.error("Dashboard modülü render edilirken hata oluştu:", error);
@@ -147,7 +153,8 @@ class DashboardModule extends BaseModule {
 
                 <!-- Son İşlemler -->
                 <section class="recent-transactions">
-                    ${this.createRecentTransactions()}
+                    <h3 class="md3-title-medium">Son İşlemler</h3>
+                    <div class="transactions-list"></div>
                 </section>
             </div>
         `;
@@ -310,5 +317,45 @@ class DashboardModule extends BaseModule {
                 break;
         }
     }
+
+    // Son işlemler
+    createRecentTransactions = function(transactions) {
+
+        // 1. Ana liste containeri
+        const listContainer = document.createElement('ul');
+        listContainer.className = 'md3-list';
+
+        transactions.forEach(transaction => {
+            const listItem = document.createElement('li');
+            listItem.className = 'md3-list-item';
+
+            // İkon ve renk atama
+            const iconSpan = document.createElement('span');
+            iconSpan.className = 'md3-list-icon material-icons ' + (transaction.type === 'income' ? 'income' : 'expense');
+            iconSpan.textContent = transaction.type === 'income' ? 'trending_up' : 'trending_down';
+            
+            // İçerik
+            const contentSpan = document.createElement('span');
+            contentSpan.className = 'md3-list-content';
+            contentSpan.innerHTML = `${transaction.description} <span class="md3-list-secondary">${transaction.category} • ${new Date(transaction.date).toLocaleDateString()}</span>`;
+
+            // Tutar
+            const amountSpan = document.createElement('span');
+            amountSpan.className = `md3-list-amount ${transaction.type}`;
+            amountSpan.textContent = `${transaction.type === 'income' ? '+' : '-'}${transaction.amount.toFixed(2)} ₺`;
+
+            // Liste öğesini oluştur
+            listItem.appendChild(iconSpan);
+            listItem.appendChild(contentSpan);
+            listItem.appendChild(amountSpan);
+
+            // Listeye ekle
+            listContainer.appendChild(listItem);
+        });
+
+        // Listeyi döndür
+        return listContainer;
+    }
+
 }
 export default DashboardModule;

@@ -1,3 +1,7 @@
+## 29.06.2025 Güncellemesi
+- Dashboard son işlemler listesi MD3 uyumlu ve modüler hale getirildi.
+- Material Icons ile ikon ve renk bütünlüğü sağlandı.
+- Sonraki adım: Diğer modüllerin (Gelir, Gider, Raporlar) aynı mimariyle hazırlanması ve AppCoordinator/Router entegrasyonu.
 # Proje Geliştirme Planı - Dinamik Bütçe Takip Aracı
 
 ## 📋 PROJE KILAVUZU VE ROADMAP

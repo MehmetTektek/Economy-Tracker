@@ -164,6 +164,14 @@
     color: var(--md3-on-surface-variant);
 }
 
+.material-icons.income {
+  color: #388e3c; /* MD3 success/gelir rengi */
+}
+.material-icons.expense {
+  color: #d32f2f; /* MD3 error/gider rengi */
+}
+
+
 /* ================================================
    RESPONSİVE TASARIM - MEDIA QUERIES
    ================================================ */
