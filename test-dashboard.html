@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Modül Testi</title>
+
+    <!-- Material Design 3 -->
+    <link rel="stylesheet" href="src/styles/core/md3-variables.css">
+    <link rel="stylesheet" href="src/styles/core/md3-components.css">
+
+    <!-- Dashboard Modül CSS -->
+    <link rel="stylesheet" href="src/modules/dashboard/dashboard.css">
+
+    <!-- Material Icons -->
+     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+     <!-- Roboto Font -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Custom Styles -->
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--md3-surface-dim);
+        }
+
+        #app-container {
+            max-width: 1200px;
+            margin: 0 auto;            
+        }
+
+        .test-controls {
+            margin: 20px 0;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+            .console-log {
+        margin-top: 30px;
+        padding: 16px;
+        background-color: var(--md3-surface-container);
+        border-radius: 8px;
+        border: 1px solid var(--md3-outline-variant);
+    }
+    
+    #log-output {
+        background-color: #000;
+        color: #0f0;
+        padding: 12px;
+        border-radius: 4px;
+        font-family: 'Courier New', monospace;
+        font-size: 12px;
+        max-height: 200px;
+        overflow-y: auto;
+    }
+    </style>
+
+</head>
+<body>
+    <!-- Test Container -->
+     <div id="app-container">
+        <h1>Dashboard Modül Testi</h1>
+        <p>Dashboard test ediliyor...</p>
+
+        <!-- Dashboard buraya render edilecek-->
+        <div id="dashboard-container">
+            <!-- Dashboard içeriği burada oluşturulacak -->
+    </div>
+
+    <!-- Test butonları -->
+    <div class="test-controls">
+        <button id="init-btn" class="md3-button md3-button-filled">
+            Dashboard'u Başlat
+        </button>
+        <button id="load-data-btn" class="md3-button md3-button-outlined">
+            Test verisi yükle
+        </button>
+        <button id="destroy-btn" class="md3-button md3-button-outlined">
+            Dashboard'u Temizle
+    </div>
+
+        <!-- Console log alanı -->
+        <div class="console-log">
+            <h3>Console Log</h3>
+            <div id="log-output"></div>
+        </div>
+
+    <!-- Javascript modülleri-->
+    <script type="module" src="test-dashboard.js"></script>
+</body>
+</html>

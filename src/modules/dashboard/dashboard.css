@@ -1,2 +1,199 @@
-/* Dashboard Module CSS - Material Design 3 Compliant */
-/* Bu dosya dashboard modülü için MD3 uyumlu stil tanımlarını içerecek */
+/* ================================================
+   DASHBOARD MODULE - MATERIAL DESIGN 3 STYLES
+   ================================================ */
+
+/* Ana Dashboard Container */
+
+.dashboard-container {
+    padding: 24px;
+    background-color: var(--md3-surface);
+    border-radius: 12px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.dashboard-header {
+    margin-bottom: 32px;
+    text-align: center;   
+}
+
+.dashboard-header h1 {
+    color: var(--md3-on-surface);
+    margin: 0 0 8px 0;
+}
+
+.dashboard-header p {
+    color: var(--md3-on-surface-variant);
+    margin: 0;
+}
+
+/* ================================================
+   FİNANSAL KARTLAR
+   ================================================ */
+
+.financial-summary {
+    margin-bottom: 32px;
+}
+
+.financial-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.financial-card {
+    padding: 20px;
+    border-radius: 12px;
+    background-color: var(--md3-surface-container);
+    border: 1px solid var(--md3-outline-variant);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.financial-card:hover {
+    box-shadow: var(--md3-elevation-level-1);
+    transform: translateY(-2px);
+}
+
+.card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.card-content .md3-label-large {
+    color: var(--md3-on-surface-variant);
+    font-weight: 500;
+}
+
+.card-content .md3-label-medium {
+    color: var(--md3-on-surface);
+    font-weight: 600;
+}
+
+.card-icon {
+    font-size: 32px;
+    opacity: 0.7;
+}
+
+/* Kart Renkleri */
+.balance-card .card-icon { color: var(--md3-primary); }
+.income-card .card-icon { color: #4CAF50; }
+.expense-card .card-icon { color: #F44336; }
+.debt-card .card-icon { color: #FF9800; }
+
+/* ================================================
+   HIZLI İŞLEMLER
+   ================================================ */
+.quick-actions {
+    margin-bottom: 32px;
+}
+
+.quick-actions-grid h3 {
+    color: var(--md3-on-surface);
+    margin: 0 0 16px 0;
+}
+
+.actions-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+}
+
+.quick-action-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    border-radius: 20px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.quick-action-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--md3-elevation-level-2);
+}
+
+.quick-action-btn .material-icons {
+    font-size : 20px;
+}
+
+/* ================================================
+   SON İŞLEMLER
+   ================================================ */
+
+.recent-transactions-container h3 {
+    color: var(--md3-on-surface);
+    margin : 0 0 16px 0;
+}
+
+.transactions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.transaction-item {
+    padding: 16px;
+    border-radius: 8px;
+    background-color: var(--md3-surface-container-low);
+    border: 1px solid var(--md3-outline-variant);
+    transition: background-color 0.2s ease;
+}
+
+.transaction-item:hover {
+    background-color: var(--md3-surface-container);
+}
+
+.transaction-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.transaction-content .md3-body-large {
+    color: var(--md3-on-surface);
+}
+
+.transaction-content .md3-label-small {
+    color: var(--md3-on-surface-variant);
+}
+
+/* ================================================
+   RESPONSİVE TASARIM - MEDIA QUERIES
+   ================================================ */
+
+@media (max-width: 768px) {
+    .dashboard-container {
+        padding: 16px;
+    }
+
+    .financial-cards-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .actions-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .financial-card {
+        flex-direction: column;
+        text-align: center;
+        gap: 12px;
+    }
+
+    .card-icon {
+        order: -1; /* İkonu üstte göster */
+    }
+
+    .quick-action-btn {
+        justify-content: center;
+    }
+}
