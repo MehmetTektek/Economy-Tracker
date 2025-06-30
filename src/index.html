@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="styles/core/md3-variables.css">
     <link rel="stylesheet" href="styles/core/md3-components.css">
     <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/app-layout.css">
+    <link rel="stylesheet" href="modules/dashboard/dashboard.css">
 
     <!-- Material Icons and Symbols -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
@@ -25,8 +27,30 @@
         <!-- Header / Navigation -->
         <header id="app-header" class="app-header md3-surface">
             <div class="header-content">
-                <h1 class="md3-headline-large app-title">Economy Tracker</h1>
-                <p class="md3-body-medium app-subtitle">Finansal takip ve yönetim sistemi</p>
+                <div class="header-title-section">
+                    <h1 class="md3-headline-large app-title">Economy Tracker</h1>
+                    <p class="md3-body-medium app-subtitle">Finansal takip ve yönetim sistemi</p>
+                </div>
+                
+                <!-- Navigation Menu -->
+                <nav class="header-navigation">
+                    <button class="nav-btn active" data-module="dashboard">
+                        <span class="material-icons">dashboard</span>
+                        <span class="nav-text">Ana Sayfa</span>
+                    </button>
+                    <button class="nav-btn" data-module="income">
+                        <span class="material-icons">trending_up</span>
+                        <span class="nav-text">Gelirler</span>
+                    </button>
+                    <button class="nav-btn" data-module="expense">
+                        <span class="material-icons">trending_down</span>
+                        <span class="nav-text">Giderler</span>
+                    </button>
+                    <button class="nav-btn" data-module="reports">
+                        <span class="material-icons">bar_chart</span>
+                        <span class="nav-text">Raporlar</span>
+                    </button>
+                </nav>
             </div>
         </header>
 

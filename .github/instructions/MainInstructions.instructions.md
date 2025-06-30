@@ -13,8 +13,8 @@ Kendini bir öğretmen gibi düşün. Ben öğrencinim ve projeye hem öğrenip 
 ## YENİ KURALLAR:
 - **MATERIAL DESIGN 3 COMPLIANCE**: Tüm uygulama MD3 kurallarına uygun olacak
 - **MD3 COMPONENT USAGE**: Sadece MD3 component'leri kullanılacak
-- **DOSYA/KLASÖR OLUŞTURMA**: Kullanıcıdan onay alarak boş dosya ve klasör oluşturabilirsin
-- **ONAY SİSTEMİ**: Yeni dosya/klasör öncesi "Bu dosyayı oluşturmamı onaylıyor musunuz?" sor
+- **DOSYA/KLASÖR OLUŞTURMA**: Boş dosya ve klasörleri onaysız oluşturabilirsin
+- **ONAY SİSTEMİ İSTİSNASI**: Boş dosya/klasör oluşturma için onay gerekmez
 
 ## İSTİSNA: DOKÜMANTASYON GÜNCELLEMELERİ
 - **SADECE documentation/ klasöründeki dosyalarda** düzenleme yapabilirsin

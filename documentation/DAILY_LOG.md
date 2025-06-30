@@ -1,3 +1,13 @@
+### 30.06.2025
+- AppCoordinator sistemi oluşturuldu ve modüler mimari için temel koordinatör geliştirildi.
+- Router.js ile URL tabanlı navigasyon sistemi implementasyonu tamamlandı.
+- app-layout.css ile MD3 uyumlu ana sayfa layout stilleri oluşturuldu.
+- Factory pattern ile modül yönetimi sistemi kuruldu.
+- Git workflow ile feature/app-coordinator branch'ine geçiş yapıldı.
+- Yeni modüler index.html ana sayfa yapısı oluşturuldu.
+
+---
+
 ### 29.06.2025
 - Son işlemler listesi için MD3 ikon ve renk sistemi başarıyla entegre edildi.
 - Material Icons fontu ve class'ları ile Dashboard'daki tüm ikonlar tutarlı hale getirildi.
